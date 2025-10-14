@@ -2,7 +2,7 @@ const jdModel = require('../models/jd.model')
 
 async function jdController(req, res){
     
-    const text = req.body
+    const text = req.body.content
 
     if(!text) return res.status(400).json({ message: "Job description text required" })
     

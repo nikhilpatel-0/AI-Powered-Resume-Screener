@@ -62,8 +62,6 @@ async function compareResume(resumeContent, jdContent) {
 
     let result;
 
-    console.log("AI Response : ", response.text)
-
     try {
         result = JSON.parse(response.text)
     } catch (error) {

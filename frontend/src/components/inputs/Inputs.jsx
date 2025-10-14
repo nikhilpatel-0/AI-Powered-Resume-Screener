@@ -1,18 +1,19 @@
 import React, { useState } from "react";
+import axios from "axios"
 
-const Inputs = () => {
-  // State to store selected file
+const Inputs = ({setResultData}) => {
+
   const [file, setFile] = useState(null);
-
-  // State to handle drag-and-drop visual effect
+  const [jobDescription, setJobDescription] = useState("")
   const [isDragging, setIsDragging] = useState(false);
+  const [loadingResume, setLoadingResume] = useState(false)
+  const [loadingJD, setLoadingJD] = useState(false)
+  // const [matchData, setMatchData] = useState(null)
 
   // Handle file selection through input
   const handleChange = (e) => {
     const selectedFile = e.target.files[0];
-    if (selectedFile) {
-      setFile(selectedFile);
-    }
+    if (selectedFile) setFile(selectedFile);
   };
 
   // Handle delete file
@@ -28,6 +29,74 @@ const Inputs = () => {
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
     return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${sizes[i]}`;
   };
+
+   //  API CALL 1: Upload Resume
+
+   const handleResumeUpload = async () => {
+    if(!file){
+      console.log("No selected file")
+       return alert("Please upload a resume first!")
+    }
+    console.log("selected file", file)
+    try {
+      setLoadingResume(true)
+      const formData = new FormData()
+      formData.append("resume", file)
+
+      const res = await axios.post(
+        "http://localhost:3000/api/resume/upload",
+        formData,
+        {
+          headers: {"Content-Type": "multipart/form-data"},
+          withCredentials: true
+        }
+      )
+
+      alert("Resume uploaded successfully!")
+      console.log(res.data)
+    } catch (err) {
+      console.error(err)
+      alert("Error uploading resume!")
+    }finally{
+      setLoadingResume(false)
+    }
+   }
+
+   //  API CALL 2: Upload JD
+   const handlejDSubmit = async () => {
+    if(!jobDescription.trim()) return alert("Please enter a job description!")
+    try {
+      setLoadingJD(true)
+      const res = await axios.post(
+        "http://localhost:3000/api/jd/upload-jd",
+        {content:jobDescription},
+        {withCredentials:true}
+      )
+      alert("Job description saved successfully!")
+      console.log(res.data)
+    } catch (err) {
+      console.error(err)
+      alert("Error uploading JD")
+    }finally{
+      setLoadingJD(false)
+    }
+   }
+
+   //  API CALL 3: Match Resume & JD via AI
+   const matchHandle = async () => {
+    if(!file || !jobDescription.trim()) return alert("Please upload both Resume and Job Description first!")
+
+    try {
+      const res = await axios.post("http://localhost:3000/api/resume/compare",
+        { file, jobDescription },
+        {withCredentials:true}
+      )
+      setResultData(res.data)
+    } catch (err) {
+      console.error(err)
+      alert("Error fetching AI match result")
+    }
+   }
 
   // Drag events for highlighting the drop area
   const handleDragEnter = (e) => {
@@ -51,7 +120,7 @@ const Inputs = () => {
 
   return (
     <div>
-      <div className="md:grid grid-cols-2 p-6 gap-4 items-center ">
+      <div className="md:grid grid-cols-2 p-6 gap-4 items-stretch">
         
         {/* Upload Resume Section */}
         <div className="rounded-xl bg-white/5 p-6 ring-1 ring-white/10 backdrop-blur-xl">
@@ -118,17 +187,28 @@ const Inputs = () => {
                 {/* Delete Button */}
                 <button
                   onClick={handleDelete}
-                  className="text-red-400 hover:text-red-300"
+                  className="text-red-400 hover:text-red-300 cursor-pointer"
                 >
                   <i className="ri-delete-bin-line text-xl"></i>
                 </button>
               </div>
             </div>
           )}
+
+          <div className="flex items-center justify-center mt-4">
+            <button
+             className="flex items-center gap-2 bg-white/5 rounded-xl px-4 py-2 text-sm font-medium text-slate-200 hover:bg-white/10 ring-1 ring-white/10 transition"
+             onClick={handleResumeUpload}
+             disabled={loadingResume}
+             >
+              <i className="ri-file-upload-fill text-indigo-300 text-xl"></i>
+              {loadingResume? "Uploading" : "Resume Upload"}
+            </button>
+          </div>
         </div>
 
         {/* Job Description Section */}
-        <div className="rounded-xl md:mt-0 mt-6 p-6 bg-white/5 ring-1 ring-white/10 backdrop-blur-xl">
+        <div className="rounded-xl md:mt-0 mt-6 p-6 bg-white/5 ring-1 ring-white/10 backdrop-blur-xl flex flex-col justify-between h-full">
           {/* Header */}
           <div className="flex items-center gap-2">
             <i className="ri-briefcase-3-line text-2xl text-indigo-300"></i>
@@ -152,8 +232,10 @@ const Inputs = () => {
             <textarea
               name="jobDescription"
               id="jobDescription"
+              value={jobDescription}
+              onChange={(e) => setJobDescription(e.target.value)}
               placeholder="Paste the job description here..."
-              className="placeholder-slate-400 bg-white/5 w-full h-50 pt-3 pr-4 pb-3 pl-4 focus:outline-none focus:ring-2 focus:ring-indigo-400/40 text-slate-200 block resize-none rounded-xs"
+              className="placeholder-slate-400 bg-white/5 w-full h-70 pt-3 pr-4 pb-3 pl-4 focus:outline-none focus:ring-2 focus:ring-indigo-400/40 text-slate-200 block resize-none rounded-xs"
             ></textarea>
           </div>
 
@@ -164,12 +246,28 @@ const Inputs = () => {
               <span>Data stays on your device until you submit.</span>
             </div>
 
-            <button className="group mt-3 md:mt-0 inline-flex items-center gap-2 bg-white/5 rounded-xl px-4 py-2 text-sm font-medium text-slate-200 hover:bg-white/10 ring-1 ring-white/10 transition">
-              <i className="ri-flashlight-line text-indigo-300 group-hover:text-indigo-200"></i>
-              Instant Analyze
+            <button className="group mt-3 md:mt-0 inline-flex items-center gap-2 bg-white/5 rounded-xl px-4 py-2 text-sm font-medium text-slate-200 hover:bg-white/10 ring-1 ring-white/10 transition"
+            onClick={handlejDSubmit}
+            disabled={loadingJD}
+            >
+              <i className="ri-file-upload-fill text-indigo-300 group-hover:text-indigo-200"></i>
+              {loadingJD? "Saving..." : "Upload JD"}
             </button>
           </div>
         </div>
+        </div>
+
+        <div className="flex flex-col items-center justify-center mt-8 mx-auto">
+          <button
+          className="group inline-flex items-center gap-3 bg-gradient-to-r from-indigo-500/20 via-blue-500/20 to-green-500/20 ring-1 ring-white/10 rounded-2xl px-6 py-3 text-lg font-medium text-slate-200 transition-all duration-200 backdrop-blur-xl"
+          onClick={matchHandle}
+          >
+            <i className="ri-flashlight-line text-2xl text-indigo-300 group-hover:text-indigo-100"></i>
+            Analyze
+          </button>
+          <p className="text-slate-400 text-sm mt-2 text-center">
+            Ensure both resume and job description are uploaded before analyzing.
+          </p>
       </div>
     </div>
   );
