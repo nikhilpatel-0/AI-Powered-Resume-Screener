@@ -44,7 +44,7 @@ const Inputs = ({setResultData}) => {
       formData.append("resume", file)
 
       const res = await axios.post(
-        "http://localhost:3000/api/resume/upload",
+        "https://ai-powered-resume-screener-xe66.onrender.com/api/resume/upload",
         formData,
         {
           headers: {"Content-Type": "multipart/form-data"},
@@ -68,7 +68,7 @@ const Inputs = ({setResultData}) => {
     try {
       setLoadingJD(true)
       const res = await axios.post(
-        "http://localhost:3000/api/jd/upload-jd",
+        "https://ai-powered-resume-screener-xe66.onrender.com/api/jd/upload-jd",
         {content:jobDescription},
         {withCredentials:true}
       )
@@ -87,7 +87,7 @@ const Inputs = ({setResultData}) => {
     if(!file || !jobDescription.trim()) return alert("Please upload both Resume and Job Description first!")
 
     try {
-      const res = await axios.post("http://localhost:3000/api/resume/compare",
+      const res = await axios.post("https://ai-powered-resume-screener-xe66.onrender.com/api/resume/compare",
         { file, jobDescription },
         {withCredentials:true}
       )

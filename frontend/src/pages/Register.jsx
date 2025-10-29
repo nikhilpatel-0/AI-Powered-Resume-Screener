@@ -12,7 +12,7 @@ const Register = () => {
   const onSubmit = (e)=>{
     e.preventDefault()
 
-    axios.post("http://localhost:3000/api/auth/register",
+    axios.post("https://ai-powered-resume-screener-xe66.onrender.com/api/auth/register",
       {name:form.name, email:form.email, password:form.password},
       {withCredentials:true}
     ).then((res)=>{
