@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios"
+import { toast } from "react-toastify";
 
 const Inputs = ({setResultData}) => {
 
@@ -8,7 +9,7 @@ const Inputs = ({setResultData}) => {
   const [isDragging, setIsDragging] = useState(false);
   const [loadingResume, setLoadingResume] = useState(false)
   const [loadingJD, setLoadingJD] = useState(false)
-  // const [matchData, setMatchData] = useState(null)
+  const [analyze, setAnalyze] = useState(false)
 
   // Handle file selection through input
   const handleChange = (e) => {
@@ -35,7 +36,7 @@ const Inputs = ({setResultData}) => {
    const handleResumeUpload = async () => {
     if(!file){
       console.log("No selected file")
-       return alert("Please upload a resume first!")
+       return toast.error("Please upload a resume first!")
     }
     console.log("selected file", file)
     try {
@@ -52,11 +53,11 @@ const Inputs = ({setResultData}) => {
         }
       )
 
-      alert("Resume uploaded successfully!")
+      toast.success("Resume uploaded successfully!")
       console.log(res.data)
     } catch (err) {
       console.error(err)
-      alert("Error uploading resume!")
+      toast.error("Error uploading resume!")
     }finally{
       setLoadingResume(false)
     }
@@ -64,7 +65,7 @@ const Inputs = ({setResultData}) => {
 
    //  API CALL 2: Upload JD
    const handlejDSubmit = async () => {
-    if(!jobDescription.trim()) return alert("Please enter a job description!")
+    if(!jobDescription.trim()) return toast.error("Please enter a job description!")
     try {
       setLoadingJD(true)
       const res = await axios.post(
@@ -72,11 +73,11 @@ const Inputs = ({setResultData}) => {
         {content:jobDescription},
         {withCredentials:true}
       )
-      alert("Job description saved successfully!")
+      toast.success("Job description saved successfully!")
       console.log(res.data)
     } catch (err) {
       console.error(err)
-      alert("Error uploading JD")
+      toast.error("Error uploading JD")
     }finally{
       setLoadingJD(false)
     }
@@ -84,9 +85,10 @@ const Inputs = ({setResultData}) => {
 
    //  API CALL 3: Match Resume & JD via AI
    const matchHandle = async () => {
-    if(!file || !jobDescription.trim()) return alert("Please upload both Resume and Job Description first!")
+    if(!file || !jobDescription.trim()) return toast.error("Please upload both Resume and Job Description first!")
 
     try {
+      setAnalyze(true)
       const res = await axios.post("https://ai-powered-resume-screener-xe66.onrender.com/api/resume/compare",
         { file, jobDescription },
         {withCredentials:true}
@@ -94,7 +96,9 @@ const Inputs = ({setResultData}) => {
       setResultData(res.data)
     } catch (err) {
       console.error(err)
-      alert("Error fetching AI match result")
+      toast.error("Error fetching AI match result")
+    }finally{
+      setAnalyze(false)
     }
    }
 
@@ -261,9 +265,10 @@ const Inputs = ({setResultData}) => {
           <button
           className="group inline-flex items-center gap-3 bg-gradient-to-r from-indigo-500/20 via-blue-500/20 to-green-500/20 ring-1 ring-white/10 rounded-2xl px-6 py-3 text-lg font-medium text-slate-200 transition-all duration-200 backdrop-blur-xl"
           onClick={matchHandle}
+          disabled={analyze}
           >
             <i className="ri-flashlight-line text-2xl text-indigo-300 group-hover:text-indigo-100"></i>
-            Analyze
+            {analyze? "Analyzing..." : "Analyze"}
           </button>
           <p className="text-slate-400 text-sm mt-2 text-center">
             Ensure both resume and job description are uploaded before analyzing.

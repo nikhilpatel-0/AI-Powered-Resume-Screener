@@ -1,4 +1,3 @@
-import React from "react";
 
 const Hero = () => {
   return (
@@ -27,7 +26,8 @@ const Hero = () => {
           {/* Action Buttons */}
           <div className="md:flex-row flex flex-col items-center gap-3 mt-5">
             {/* Primary CTA */}
-            <button className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-sm font-medium text-white shadow-md shadow-indigo-900/30 ring-1 ring-white/15 hover:brightness-110 transition">
+            <button
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-sm font-medium text-white shadow-md shadow-indigo-900/30 ring-1 ring-white/15 hover:brightness-110 transition">
               <i className="ri-magic-line text-xl"></i>
               Get Started
             </button>
