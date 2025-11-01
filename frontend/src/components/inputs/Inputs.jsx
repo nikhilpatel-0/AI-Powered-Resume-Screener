@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { forwardRef, useState } from "react";
 import axios from "axios"
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
-const Inputs = ({setResultData}) => {
+const Inputs = forwardRef (({setResultData}, ref) => {
 
   const [file, setFile] = useState(null);
   const [jobDescription, setJobDescription] = useState("")
@@ -10,6 +11,8 @@ const Inputs = ({setResultData}) => {
   const [loadingResume, setLoadingResume] = useState(false)
   const [loadingJD, setLoadingJD] = useState(false)
   const [analyze, setAnalyze] = useState(false)
+
+  const navigate = useNavigate()
 
   // Handle file selection through input
   const handleChange = (e) => {
@@ -45,7 +48,7 @@ const Inputs = ({setResultData}) => {
       formData.append("resume", file)
 
       const res = await axios.post(
-        "https://ai-powered-resume-screener-xe66.onrender.com/api/resume/upload",
+        "http://localhost:3000/api/resume/upload",
         formData,
         {
           headers: {"Content-Type": "multipart/form-data"},
@@ -57,7 +60,13 @@ const Inputs = ({setResultData}) => {
       console.log(res.data)
     } catch (err) {
       console.error(err)
-      toast.error("Error uploading resume!")
+      
+      if(err.response && err.response.status === 401) {
+        toast.error("Please login first!")
+        navigate("/login")
+      }else{
+        toast.error("Error uploading resume!")
+      }
     }finally{
       setLoadingResume(false)
     }
@@ -69,7 +78,7 @@ const Inputs = ({setResultData}) => {
     try {
       setLoadingJD(true)
       const res = await axios.post(
-        "https://ai-powered-resume-screener-xe66.onrender.com/api/jd/upload-jd",
+        "http://localhost:3000/api/jd/upload-jd",
         {content:jobDescription},
         {withCredentials:true}
       )
@@ -77,7 +86,13 @@ const Inputs = ({setResultData}) => {
       console.log(res.data)
     } catch (err) {
       console.error(err)
-      toast.error("Error uploading JD")
+
+      if(err.response && err.response.status === 401) {
+        toast.error("Please login first!")
+        navigate("/login")
+      }else{
+        toast.error("Error uploading JD")
+      }
     }finally{
       setLoadingJD(false)
     }
@@ -89,7 +104,7 @@ const Inputs = ({setResultData}) => {
 
     try {
       setAnalyze(true)
-      const res = await axios.post("https://ai-powered-resume-screener-xe66.onrender.com/api/resume/compare",
+      const res = await axios.post("http://localhost:3000/api/resume/compare",
         { file, jobDescription },
         {withCredentials:true}
       )
@@ -123,7 +138,7 @@ const Inputs = ({setResultData}) => {
   };
 
   return (
-    <div>
+    <div ref={ref}>
       <div className="md:grid grid-cols-2 p-6 gap-4 items-stretch">
         
         {/* Upload Resume Section */}
@@ -276,6 +291,6 @@ const Inputs = ({setResultData}) => {
       </div>
     </div>
   );
-};
+});
 
 export default Inputs;

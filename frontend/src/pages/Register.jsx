@@ -12,7 +12,7 @@ const Register = () => {
   const onSubmit = (e)=>{
     e.preventDefault()
 
-    axios.post("https://ai-powered-resume-screener-xe66.onrender.com/api/auth/register",
+    axios.post("http://localhost:3000/api/auth/register",
       {name:form.name, email:form.email, password:form.password},
       {withCredentials:true}
     ).then((res)=>{
@@ -27,6 +27,13 @@ const Register = () => {
   }
 
   return (
+    <div className="overflow-hidden h-screen">
+      <button 
+      onClick={ () => navigate("/")}
+      className="w-16 h-16 flex items-center justify-center absolute md:pl-10 cursor-pointer"
+      >
+        <i className="ri-arrow-left-line text-indigo-300 text-3xl"></i>
+      </button>
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-blue-900 to-indigo-950 px-4">
       <div className="bg-white/10 backdrop-blur-lg ring-1 ring-white/20 shadow-2xl rounded-2xl p-10 w-full max-w-md text-center">
         {/* Greeting */}
@@ -106,6 +113,7 @@ const Register = () => {
           </a>
         </p>
       </div>
+    </div>
     </div>
   );
 };
