@@ -12,7 +12,7 @@ const Login = () => {
   const onSubmit = async (e)=>{
     e.preventDefault()
 
-    axios.post("http://localhost:3000/api/auth/login", {
+    axios.post("https://ai-powered-resume-screener-xe66.onrender.com/api/auth/login", {
       email: form.email,
       password: form.password
 
