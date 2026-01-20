@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {useNavigate} from "react-router-dom"
 import axios from "axios"
+import { toast } from "react-toastify";
 const Login = () => {
   const [form, setForm] = useState({email:'', password:''})
   const navigate = useNavigate()
@@ -22,6 +23,10 @@ const Login = () => {
       navigate("/")
     }).catch((err)=>{
       console.log(err)
+
+      if(err.response && err.response.status === 400)
+        toast.error("Please register first!")
+        navigate("/register")
     })
 
     console.log("login", form)

@@ -47,11 +47,15 @@ const Footer = () => {
             <div>
             <h3 className="text-white font-semibold mb-3">Follow Us</h3>
             <div className="flex gap-4 text-sm md:flex-col">
-                <a href="#" className="flex gap-1 hover:text-white transition">
+                <a href="https://www.linkedin.com/in/nikhil-patel-dev/" 
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className="flex gap-1 hover:text-white transition"
+                >
                     <i className="ri-linkedin-box-fill text-blue-400"></i>
                     LinkedIn
                 </a>
-                <a href="#" className="flex gap-1 hover:text-white transition">
+                <a href="https://github.com/nikhilpatel-0" target='_blank' rel='noopener noreferrer' className="flex gap-1 hover:text-white transition">
                     <i className="ri-github-fill text-gray-300"></i>
                     GitHub
                 </a>

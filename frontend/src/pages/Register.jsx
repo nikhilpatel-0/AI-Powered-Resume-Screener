@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {useNavigate} from "react-router-dom"
 import axios from "axios"
+import { toast } from "react-toastify";
 const Register = () => {
   const [form, setForm] = useState({name: '', email: '', password: ''})
   const navigate = useNavigate()
@@ -20,6 +21,8 @@ const Register = () => {
       navigate("/")
     }).catch((err)=>{
       console.log(err)
+      const message = err.response?.data?.message || "user already exists"
+      toast.error(message)
     })
 
     console.log("register", form)
