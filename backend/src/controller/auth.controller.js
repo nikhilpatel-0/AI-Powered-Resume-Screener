@@ -8,7 +8,7 @@ async function registerController(req, res){
 
     const isUser = await userModel.findOne({email})
 
-    if(isUser) { return res.status(400).json({message: "user already exists"}) }
+    if(isUser) { return res.status(409).json({message: "user already exists"}) }
 
     const hashedPassword = await bcrypt.hash(password, 10)
 
